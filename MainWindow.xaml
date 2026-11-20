@@ -1,0 +1,301 @@
+﻿<Window x:Class="MultiCopyPrint.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Multi-Copy Print Manager" Height="780" Width="980"
+        MinHeight="600" MinWidth="800"
+        WindowStartupLocation="CenterScreen"
+        Background="#F4F6F9"
+        AllowDrop="True" Drop="Window_Drop" DragOver="Window_DragOver">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <Style TargetType="Button" x:Key="PrimaryBtn">
+            <Setter Property="Background" Value="#1E88E5"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1976D2"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="Button" x:Key="SecondaryBtn">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#37474F"/>
+            <Setter Property="BorderBrush" Value="#CFD8DC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#ECEFF1"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="Button" x:Key="MiniPillBtn">
+            <Setter Property="Background" Value="#ECEFF1"/>
+            <Setter Property="Foreground" Value="#455A64"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#CFD8DC"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Header -->
+            <RowDefinition Height="Auto"/> <!-- Instructions Parser -->
+            <RowDefinition Height="Auto"/> <!-- Controls & Quick Fill -->
+            <RowDefinition Height="*"/>    <!-- Page Matrix -->
+            <RowDefinition Height="Auto"/> <!-- Footer / Actions -->
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="White" CornerRadius="8" Padding="16,12" Margin="0,0,0,10" BorderBrush="#E0E0E0" BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="Multi-Copy Print Manager" FontSize="19" FontWeight="Bold" Foreground="#263238"/>
+                    <TextBlock x:Name="TxtDocumentStatus" Text="Drag &amp; drop a PDF here or click Browse to load a document" FontSize="13" Foreground="#78909C" Margin="0,3,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="📁 Browse PDF" Style="{StaticResource SecondaryBtn}" Click="BtnBrowse_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Instructions Parser Bar -->
+        <Border Grid.Row="1" Background="White" CornerRadius="8" Padding="14,10" Margin="0,0,0,10" BorderBrush="#E0E0E0" BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="📋 Instructions:" FontWeight="SemiBold" FontSize="13" Foreground="#37474F" VerticalAlignment="Center" Margin="0,0,10,0"/>
+
+                <Grid Grid.Column="1" Margin="0,0,10,0">
+                    <TextBox x:Name="TxtInstructions" Height="32" VerticalContentAlignment="Center" Padding="8,0" FontSize="13"
+                             ToolTip="Paste WhatsApp/Email instructions (e.g. 1- 3, 2- 2, 3- 4, 4- 6, 5- 8 or Pg 1: 5, Pg 2-4: 10, All: 20)"/>
+                    <TextBlock Text="e.g.  1- 3, 2- 2, 3- 4, 4- 6, 5- 8  or  Pg 1: 5, Pg 2-4: 10, All: 20"
+                               Foreground="#90A4AE" FontStyle="Italic" FontSize="13"
+                               VerticalAlignment="Center" Margin="10,0,0,0" IsHitTestVisible="False">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, ElementName=TxtInstructions}" Value="">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Text, ElementName=TxtInstructions}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+
+                <Button Grid.Column="2" Content="⚡ Apply Instructions" Style="{StaticResource PrimaryBtn}" Padding="14,6" FontSize="13" Click="BtnApplyInstructions_Click"/>
+            </Grid>
+        </Border>
+
+        <!-- Global Controls & Quick Fill Bar -->
+        <Border Grid.Row="2" Background="White" CornerRadius="8" Padding="16,10" Margin="0,0,0,10" BorderBrush="#E0E0E0" BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Checkbox to apply same copies to all pages -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <CheckBox x:Name="ChkSameForAll" Content="Same prints for all" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" Checked="ChkSameForAll_Changed" Unchecked="ChkSameForAll_Changed"/>
+                    <TextBlock Text="Copies:" Margin="12,0,6,0" VerticalAlignment="Center" Foreground="#546E7A" IsEnabled="{Binding ElementName=ChkSameForAll, Path=IsChecked}"/>
+                    <TextBox x:Name="TxtGlobalCopies" Text="1" Width="48" Height="26" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="13" IsEnabled="{Binding ElementName=ChkSameForAll, Path=IsChecked}" TextChanged="TxtGlobalCopies_TextChanged"/>
+                </StackPanel>
+
+                <!-- Quick Fill Presets -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="Quick Fill:" VerticalAlignment="Center" FontSize="12" Foreground="#78909C" Margin="0,0,8,0"/>
+                    <Button Content="All = 1" Style="{StaticResource MiniPillBtn}" Click="BtnQuickFill_All1_Click"/>
+                    <Button Content="All = 0" Style="{StaticResource MiniPillBtn}" Click="BtnQuickFill_All0_Click"/>
+                    <Button Content="Odd Only" Style="{StaticResource MiniPillBtn}" Click="BtnQuickFill_Odd_Click"/>
+                    <Button Content="Even Only" Style="{StaticResource MiniPillBtn}" Click="BtnQuickFill_Even_Click"/>
+                </StackPanel>
+
+                <!-- Printer Dropdown + Settings Button -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Printer:" Margin="0,0,6,0" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#37474F"/>
+                    <ComboBox x:Name="CmbPrinters" Width="200" Height="28" VerticalContentAlignment="Center" FontSize="12"/>
+                    <Button Content="⚙️ Settings" Style="{StaticResource SecondaryBtn}" Padding="8,4" Margin="6,0,0,0" ToolTip="Open native Windows printer driver preferences (Paper Tray, Duplex, Finishing)" Click="BtnDriverSettings_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Page Matrix ItemsControl -->
+        <Border Grid.Row="3" Background="White" CornerRadius="8" BorderBrush="#E0E0E0" BorderThickness="1" Padding="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="36"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Table Header -->
+                <Border Grid.Row="0" Background="#ECEFF1" CornerRadius="8,8,0,0" Padding="16,0">
+                    <Grid VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="90"/>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="200"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Page #" FontWeight="Bold" Foreground="#455A64" FontSize="13"/>
+                        <TextBlock Grid.Column="1" Text="Preview" FontWeight="Bold" Foreground="#455A64" FontSize="13"/>
+                        <TextBlock Grid.Column="2" Text="Page Details" FontWeight="Bold" Foreground="#455A64" FontSize="13"/>
+                        <TextBlock Grid.Column="3" Text="Number of Prints" FontWeight="Bold" Foreground="#455A64" FontSize="13" HorizontalAlignment="Center"/>
+                    </Grid>
+                </Border>
+
+                <!-- Scrollable Rows -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="LstPages">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="#ECEFF1" BorderThickness="0,0,0,1" Padding="16,8">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSkipped}" Value="True">
+                                                    <Setter Property="Opacity" Value="0.45"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Grid VerticalAlignment="Center">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="90"/>
+                                            <ColumnDefinition Width="140"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="200"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Page Number -->
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <Border Background="#E1F5FE" CornerRadius="12" Width="36" Height="36" HorizontalAlignment="Left">
+                                                <TextBlock Text="{Binding PageNumber}" FontWeight="Bold" Foreground="#0288D1" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </StackPanel>
+
+                                        <!-- Thumbnail -->
+                                        <Border Grid.Column="1" Width="80" Height="105" Background="#FAFAFA" BorderBrush="#CFD8DC" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Left">
+                                            <Image Source="{Binding Thumbnail}" Stretch="Uniform"/>
+                                        </Border>
+
+                                        <!-- Details -->
+                                        <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding PageNumber, StringFormat='Page {0} of document'}" FontWeight="SemiBold" FontSize="14" Foreground="#37474F"/>
+                                            <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                                <TextBlock Text="Ready" FontSize="12" Foreground="#90A4AE"/>
+                                                <!-- SKIPPED Badge -->
+                                                <Border Background="#ECEFF1" CornerRadius="3" Padding="6,1" Margin="8,0,0,0"
+                                                        Visibility="{Binding IsSkipped, Converter={StaticResource BoolToVis}}">
+                                                    <TextBlock Text="SKIPPED (0 copies)" FontSize="10" FontWeight="Bold" Foreground="#78909C"/>
+                                                </Border>
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <!-- Prints Input with Auto-Advance -->
+                                        <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Button Content="-" Width="28" Height="28" Tag="{Binding}" Click="BtnDec_Click" FontWeight="Bold" FontSize="14" Background="#ECEFF1" BorderThickness="0" Cursor="Hand"/>
+                                            <TextBox Text="{Binding CopyCount, UpdateSourceTrigger=PropertyChanged}" Width="55" Height="28" Margin="6,0"
+                                                     VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="14"
+                                                     TextChanged="TxtCopyCount_TextChanged"
+                                                     GotFocus="TxtCopyCount_GotFocus"
+                                                     KeyDown="TxtCopyCount_KeyDown"/>
+                                            <Button Content="+" Width="28" Height="28" Tag="{Binding}" Click="BtnInc_Click" FontWeight="Bold" FontSize="14" Background="#ECEFF1" BorderThickness="0" Cursor="Hand"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!-- Footer Bar -->
+        <Border Grid.Row="4" Background="White" CornerRadius="8" Padding="16,12" Margin="0,10,0,0" BorderBrush="#E0E0E0" BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock x:Name="TxtTotalSummary" Text="Total prints: 0 sheets" FontSize="16" FontWeight="Bold" Foreground="#1E88E5"/>
+                    <TextBlock x:Name="TxtJobStatus" Text="Ready (Scale: Exact 100% noscale)" FontSize="12" Foreground="#78909C"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="💾 Save CMYK PDF (RIP / Hotfolder)" Style="{StaticResource SecondaryBtn}" Margin="0,0,10,0" Click="BtnExportPdf_Click"/>
+                    <Button x:Name="BtnPrint" Content="🖨️ Print Now" Style="{StaticResource PrimaryBtn}" Click="BtnPrint_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

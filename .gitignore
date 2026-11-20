@@ -1,0 +1,21 @@
+## .NET Core / C# / WPF Build Outputs
+bin/
+obj/
+publish/
+
+## Visual Studio & IDE Files
+.vs/
+.vscode/
+*.user
+*.userprefs
+*.suo
+
+## Windows OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+## Logs & Temp files
+*.log
+*.tmp
+*.zip
